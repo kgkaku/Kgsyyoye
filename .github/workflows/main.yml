@@ -1,0 +1,25 @@
+# .github/workflows/refresh.yml
+name: Refresh iScreen Playlist
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # প্রতি ঘণ্টায়
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: pip install requests
+      - name: Run scraper
+        env:
+          JWT_TOKEN: ${{ secrets.ISCREEN_TOKEN }}
+        run: python main.py
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update playlists [skip ci]"
+          file_pattern: "iscreen.json iscreen.m3u"
